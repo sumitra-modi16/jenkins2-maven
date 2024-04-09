@@ -35,5 +35,28 @@ pipeline {
                 build wait: false, job: 'deply-dev-pipeline'
             }
         }
+        stage('Build') {
+            steps {
+                echo "Going to start Java Project Build using maven"
+                sh 'mvn clean package'
+            }
+        } 
+        stage('Test-Case-Report') {
+            steps {
+                echo "Let's check trend analysis of junit report"
+                junit stdioRetention: '', testResults: '**/target/surefire-reports/*.xml'
+            }
+        } 
+        stage('Archive-Artifacts') {
+            steps {
+                echo "Archiving the artifacts"
+                archiveArtifacts artifacts: '**/*.war', followSymlinks: false
+            }
+        } 
+        stage('Deploy-to-Dev') {
+            steps {
+                build wait: false, job: 'deploy-dev-pipeline'
+            }
+        } 
     }
 }
